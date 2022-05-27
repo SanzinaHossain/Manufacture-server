@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 const cors=require('cors')
 const jwt=require('jsonwebtoken');
 require('dotenv').config()
@@ -23,12 +23,14 @@ async function run(){
             const tools=await cursor.toArray()
             res.send(tools)
           })
- 
-          
-         
-          
-          
-    }
+          //collect a tools using particular id
+          app.get('/tools/:id',async(req,res)=>{ 
+            const id=req.params.id;
+            const query={_id:ObjectId(id)};
+            const tool=await toolsCollection.findOne(query);
+            res.send(tool);
+        })
+ }
     finally{
  
     }
