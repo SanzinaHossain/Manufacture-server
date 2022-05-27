@@ -16,6 +16,13 @@ async function run(){
           await client.connect();
           const toolsCollection=client.db('assignment-12').collection('tools');
           console.log("connected");
+          //get all tools data from database
+          app.get('/tools',async(req,res)=>{
+            const query={};
+            const cursor=toolsCollection.find(query);
+            const tools=await cursor.toArray()
+            res.send(tools)
+          })
  
           
          
