@@ -33,6 +33,7 @@ async function run(){
           const toolsCollection=client.db('assignment-12').collection('tools');
           const userCollection=client.db('assignment-12').collection('users');
           const reviewCollection=client.db('assignment-12').collection('reviews');
+          const bookingCollection=client.db('assignment-12').collection('booking');
           console.log("connected");
 
            //tools delete
@@ -54,12 +55,25 @@ async function run(){
             const result=await toolsCollection.insertOne(tools);
             res.send(result);
           })
+          //add booking
+          app.post('/bookings',async(req,res)=>{
+            const booked=req.body;
+            const result=await bookingCollection.insertOne(booked);
+            res.send(result);
+          })
           //get all data from reviews
           app.get('/reviews',async(req,res)=>{
             const query={};
             const cursor=reviewCollection.find(query);
             const reviews=await cursor.toArray()
             res.send(reviews)
+          })
+          //get all data from bookings
+          app.get('/bookings',async(req,res)=>{
+            const query={};
+            const cursor=bookingCollection.find(query);
+            const booked=await cursor.toArray()
+            res.send(booked)
           })
           //get all tools data from database
           app.get('/tools',async(req,res)=>{
