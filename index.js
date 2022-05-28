@@ -42,6 +42,12 @@ async function run(){
             const result=await reviewCollection.insertOne(reviews);
             res.send(result);
           })
+          //add tools
+          app.post('/tools',async(req,res)=>{
+            const tools=req.body;
+            const result=await toolsCollection.insertOne(tools);
+            res.send(result);
+          })
           //get all data from reviews
           app.get('/reviews',async(req,res)=>{
             const query={};
@@ -90,18 +96,24 @@ async function run(){
             const isadmin=user.role==='admin';
             res.send({admin:isadmin})
           })
+          //make admin
           app.put('/users/admin/:email',verifyJWT,async(req,res)=>{
             const email=req.params.email;
             const requester=req.decoded.email;
             console.log(requester);
             const requesterAccount=await userCollection.findOne({email:requester})
-            const filter={email:email}
+            if(requesterAccount.role==='admin')
+            {
+              const filter={email:email}
               const updateDoc={
                 $set:{role:'admin'},
+              };
+              const result= await userCollection.updateOne(filter,updateDoc);
+              res.send(result);
             }
-            const result= await userCollection.updateOne(filter,updateDoc);
-            res.send(result);
-            
+            else{
+              res.status(403).send({message:'forbidden access'});
+            }
           })
          
  }
