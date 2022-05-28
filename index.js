@@ -8,6 +8,7 @@ const port = process.env.PORT || 5000
 //middle wire for cors
 app.use(cors())
 app.use(express.json())
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 //token verify
 function verifyJWT(req,res,next){
     const authHeader=req.headers.authorization;
@@ -34,8 +35,23 @@ async function run(){
           const userCollection=client.db('assignment-12').collection('users');
           const reviewCollection=client.db('assignment-12').collection('reviews');
           const bookingCollection=client.db('assignment-12').collection('booking');
+          const paymentCollection=client.db('assignment-12').collection('payments');
           console.log("connected");
 
+          //payment server way
+          app.post('/create-payment-intent',async(req,res)=>{
+            const service=req.body;
+            const price=service.price;
+            const amount=price*100;
+            const paymentIntent=await stripe.paymentIntents.create({
+              amount:amount,
+              currency:'usd',
+              payment_method_types:['card']
+
+            });
+            res.send({clientSecret: paymentIntent.client_secret})
+
+          })
            //tools delete
            app.delete('/tools/:id', async(req,res)=>{
             const id = req.params.id;
@@ -68,6 +84,21 @@ async function run(){
             const reviews=await cursor.toArray()
             res.send(reviews)
           })
+          //put booking
+          app.patch('/booking/:id',async(req,res)=>{
+            const id=req.params.id;
+            const payment=req.body;
+            const filter={_id:ObjectId(id)}
+            const updateDoc={
+              $set:{
+                paid:true,
+                transactionId:payment.transactionId
+              }
+            }
+            const updatedBooking=await bookingCollection.updateOne(filter,updateDoc);
+            const result=await paymentCollection.insertOne(payment)
+            res.send(updatedBooking);
+          })
           //get all data from bookings
           app.get('/bookings',async(req,res)=>{
             const query={};
@@ -89,6 +120,13 @@ async function run(){
             const tool=await toolsCollection.findOne(query);
             res.send(tool);
         })
+        //get particular bookings
+        app.get('/bookings/:id',async(req,res)=>{ 
+          const id=req.params.id;
+          const query={_id:ObjectId(id)};
+          const booked=await bookingCollection.findOne(query);
+          res.send(booked);
+      })
         //user token setup
         app.put('/user/:email',async(req,res)=>{
             const email=req.params.email;
