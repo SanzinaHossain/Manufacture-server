@@ -32,7 +32,23 @@ async function run(){
           await client.connect();
           const toolsCollection=client.db('assignment-12').collection('tools');
           const userCollection=client.db('assignment-12').collection('users');
+          const reviewCollection=client.db('assignment-12').collection('reviews');
           console.log("connected");
+
+
+          //add review
+          app.post('/reviews',async(req,res)=>{
+            const reviews=req.body;
+            const result=await reviewCollection.insertOne(reviews);
+            res.send(result);
+          })
+          //get all data from reviews
+          app.get('/reviews',async(req,res)=>{
+            const query={};
+            const cursor=reviewCollection.find(query);
+            const reviews=await cursor.toArray()
+            res.send(reviews)
+          })
           //get all tools data from database
           app.get('/tools',async(req,res)=>{
             const query={};
