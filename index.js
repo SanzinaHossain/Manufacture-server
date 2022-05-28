@@ -34,7 +34,6 @@ async function run(){
           const userCollection=client.db('assignment-12').collection('users');
           const reviewCollection=client.db('assignment-12').collection('reviews');
           const bookingCollection=client.db('assignment-12').collection('booking');
-          const informationCollection=client.db('assignment-12').collection('userinformation');
           console.log("connected");
 
            //tools delete
@@ -56,12 +55,6 @@ async function run(){
             const result=await toolsCollection.insertOne(tools);
             res.send(result);
           })
-          //add userinformation
-          app.post('/userinformation',async(req,res)=>{
-            const user=req.body;
-            const result=await informationCollection.insertOne(user);
-            res.send(result);
-          })
           //add booking
           app.post('/bookings',async(req,res)=>{
             const booked=req.body;
@@ -74,13 +67,6 @@ async function run(){
             const cursor=reviewCollection.find(query);
             const reviews=await cursor.toArray()
             res.send(reviews)
-          })
-          //get data from userinformation
-          app.get('/userinformation',async(req,res)=>{
-            const query={};
-            const cursor=informationCollection.find(query);
-            const user=await cursor.toArray()
-            res.send(user)
           })
           //get all data from bookings
           app.get('/bookings',async(req,res)=>{
