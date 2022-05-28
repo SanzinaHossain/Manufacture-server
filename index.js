@@ -35,7 +35,13 @@ async function run(){
           const reviewCollection=client.db('assignment-12').collection('reviews');
           console.log("connected");
 
-
+           //tools delete
+           app.delete('/tools/:id', async(req,res)=>{
+            const id = req.params.id;
+            const query={_id:ObjectId(id)};
+            const result=await toolsCollection.deleteOne(query);
+            res.send(result)
+        })
           //add review
           app.post('/reviews',async(req,res)=>{
             const reviews=req.body;
