@@ -186,6 +186,18 @@ async function run(){
             const result = await userCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         })
+        //update tools
+      app.put('/tools/:id',async(req,res)=>{
+        const id = req.params.id;
+        const s = parseInt(req.body.stock);
+        console.log(s);
+        const query = {_id: ObjectId(id)};
+        const tools=await toolsCollection.findOne(query);
+        if(tools){
+        const result= await toolsCollection.updateOne(query,{$set:{stock:s}});
+        res.send(result);
+        }
+});
          
  }
     finally{
