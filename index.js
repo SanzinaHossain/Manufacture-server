@@ -108,6 +108,22 @@ async function run(){
             res.send(result);
             }
           })
+          //order
+          app.put('/bookings/order/:id',async(req,res)=>{
+            const id = req.params.id;
+            const order=req.body;
+            const query = {_id: ObjectId(id)};
+            const book=await bookingCollection.findOne(query);
+            if(book){
+            const result= await bookingCollection.updateOne(query,
+              {
+                $set:{
+                  status:order.status
+                }
+              });
+            res.send(result);
+            }
+          })
           //get all data from bookings
           app.get('/bookings',async(req,res)=>{
             const query={};
