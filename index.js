@@ -85,19 +85,21 @@ async function run(){
             res.send(reviews)
           })
           //put booking
-          app.patch('/booking/:id',async(req,res)=>{
-            const id=req.params.id;
+          app.put('/bookings/payment/:id',async(req,res)=>{
+            const id = req.params.id;
             const payment=req.body;
-            const filter={_id:ObjectId(id)}
-            const updateDoc={
-              $set:{
-                paid:true,
-                transactionId:payment.transactionId
-              }
+            const query = {_id: ObjectId(id)};
+            const book=await bookingCollection.findOne(query);
+            if(book){
+            const result= await bookingCollection.updateOne(query,
+              {
+                $set:{
+                  paid:true,
+                  transitionId:payment.transactionId
+                }
+              });
+            res.send(result);
             }
-            const updatedBooking=await bookingCollection.updateOne(filter,updateDoc);
-            const result=await paymentCollection.insertOne(payment)
-            res.send(updatedBooking);
           })
           //get all data from bookings
           app.get('/bookings',async(req,res)=>{
